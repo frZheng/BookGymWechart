@@ -5,7 +5,7 @@
 # pyautogui.typewrite(img_path)
 # time.sleep(10)
 # pyautogui.press("enter")
-
+import argparse
 
 import win32clipboard as w
 import win32con
@@ -92,22 +92,22 @@ def log_string(log, string):
 def create_path(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
-def book_cmd():
+def book_cmd(user="zfr"):
     while True:
         try:
-            book_cmd_old()
+            book_cmd_old(user)
             break
         except:
             print("error")
             pass
     # book_cmd_old()
-def book_cmd_old():
+def book_cmd_old(user="zfr"):
     today = str(time.strftime("%Y-%m-%d", time.localtime()))
     log_path = 'logs'
     create_path(log_path)
     log = open(log_path + "/{}_log.txt".format(today),"a")
-    exe_path = r"C:\Program Files (x86)\Tencent\WeChat\WeChat.exe"
-    win32api.ShellExecute(0, 'open', exe_path, '', '', 1)
+    # exe_path = r"C:\Program Files (x86)\Tencent\WeChat\WeChat.exe"
+    # win32api.ShellExecute(0, 'open', exe_path, '', '', 1)
     move_to_top("微信")
     # exit()
 
@@ -129,10 +129,35 @@ def book_cmd_old():
 
     today = datetime.datetime.today()
     day_of_week = today.weekday()
-    if day_of_week in [0]:
+
+    # 周一
+    if day_of_week == (1 - 1):
+        # user_name = "李顺友"
+        user_name = "文件传输助手"
+        text_msg = "友哥,我想订周三20点到22点的一号场地,姓名:郑富荣,手机号:15217975717"
+    elif day_of_week == (3 - 1):  # 周3
+
+        if user == "zfr":
+            user_name = "李顺友"
+            text_msg = "友哥,我想订周五20点到22点的一号场地,如果一号场地没有的话就二号场地,如果都没有的话,4-6给我一个场地哈.姓名:郑富荣,手机号:15217975717"
+        else:
+            user_name = "李顺友"
+            # user_name = "文件传输助手"
+            text_msg = "管理员,我想订周五20点到22点的2号场地.姓名:韦翠连,手机号:17879190167"
+    elif day_of_week == (4 - 1):  # 周6
         user_name = "李顺友"
+        # user_name = "文件传输助手"
+        if user == "zfr":
+            text_msg = "友哥,我想订周六16点到18点的一号场地,姓名:郑富荣,手机号:15217975717, 如果是没有的话下午随便给我2小时就行哈,最好是能连着的"
+        else:
+            text_msg = "管理员,我想订周六16点到18点的2号场地,如果是没有的话下午或者晚上随便给我2小时就行.姓名:韦翠连,手机号:17879190167"
+    elif day_of_week == (5 - 1):# 周5
+        # user_name = "李顺友"
+        user_name = "文件传输助手"
+        text_msg = "友哥,我想订周日14点到16点的一号场地,姓名:郑富荣,手机号:15217975717, 如果是没有的话下午随便给我两小时就行哈"
     else:
         user_name = "文件传输助手"
+        text_msg = "只是日志而已"
     log_string(log, user_name)
     setText(user_name)
     ctrlV()
@@ -140,7 +165,7 @@ def book_cmd_old():
     enter()
     time.sleep(1)
     # 3.复制要发送的消息，发送
-    text_msg = "友哥,我想订周三20点到22点的一号场地,姓名:郑富荣,手机号:15217975717"
+
     setText(text_msg)
     log_string(log, text_msg)
     ctrlV()
@@ -151,7 +176,7 @@ def book_cmd_old():
         # 等待时间
         # 6500-M2,这个时间估计每台电脑都不一样?
         # if cur_time >= 14 * 3600 + 0.9:
-        if cur_time >= 8 * 3600 + 0*60 + 0.5:
+        if cur_time >= 8 * 3600 + 0*60 + 1.5:
             # time.sleep(0.2)#休眠200MS，防止时间对不上
             # driver.find_element_by_class_name("btn-primary").click()  # 提交审核
             now_time = datetime.datetime.now()
@@ -169,10 +194,14 @@ if __name__ == "__main__":
     print(os.getcwd())
     print("file name: %s" % (__file__), ", code Version: ", code_version)
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--user', default="zfr", type=str)
+    args = parser.parse_args()
+
     scheduler = BlockingScheduler()
     # scheduler.add_job(func=book_cmd, args=(),
     #               trigger='cron', day_of_week=1 - 1, hour=7, minute=59, misfire_grace_time=60*5)  # 周1约周3
-    scheduler.add_job(func=book_cmd, args=(),
+    scheduler.add_job(func=book_cmd, args=(args.user,),
                       trigger='cron', hour=7, minute=59, misfire_grace_time=60 * 5)  # 周1约周3
     scheduler.start()
     # book_cmd()
